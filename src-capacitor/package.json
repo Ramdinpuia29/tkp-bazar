@@ -1,0 +1,13 @@
+{
+  "name": "tkp-bazar",
+  "version": "0.0.1",
+  "description": "TKP Bazar Veng App",
+  "author": "Ramdinpuia29 <rdpahmar@gmail>",
+  "private": true,
+  "dependencies": {
+    "@capacitor/app": "^1.0.0",
+    "@capacitor/cli": "^3.0.0",
+    "@capacitor/core": "^3.0.0",
+    "@capacitor/splash-screen": "^1.0.0"
+  }
+}

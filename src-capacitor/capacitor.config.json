@@ -1,0 +1,7 @@
+{
+  "appId": "org.tkpbzv.rdp.app",
+  "appName": "TKP Bazar Veng",
+  "bundledWebRuntime": false,
+  "npmClient": "yarn",
+  "webDir": "www"
+}
