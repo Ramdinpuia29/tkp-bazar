@@ -46,7 +46,12 @@ export default route(function (/* { store, ssrContext } */) {
 
     const requireAuth = to.meta.requireAuth;
     if (requireAuth && !(await getAuthUser())) {
-      next('/login');
+      next('/auth/login');
+    } else if (
+      (to.path === '/auth/login' || to.path === '/auth/register') &&
+      (await getAuthUser())
+    ) {
+      next({ name: 'feed', replace: true });
     } else {
       next();
     }

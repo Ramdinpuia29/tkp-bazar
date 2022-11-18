@@ -11,7 +11,7 @@ import { AuthErrors } from 'src/utils/helpers/AuthErrors';
 import { AuthState } from 'src/utils/types/auth.type';
 
 type actionsInterface = {
-  registerUser: (email: string, password: string) => Promise<void>;
+  registerWithCredentials: (email: string, password: string) => Promise<void>;
   loginWithCredentials: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
@@ -31,7 +31,7 @@ export const useAuthStore = defineStore<
     authUser: null,
   }),
   actions: {
-    async registerUser(email: string, password: string) {
+    async registerWithCredentials(email: string, password: string) {
       return await createUserWithEmailAndPassword(
         firebaseAuth,
         email,
