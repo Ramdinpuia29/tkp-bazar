@@ -1,14 +1,12 @@
 import { route } from 'quasar/wrappers';
-import { firebaseAuth } from 'src/boot/firebase';
-import { useAuthStore } from 'src/stores/auth.store';
-import { AuthUser } from 'src/utils/types/auth.type';
+import useAuthUser from 'src/composables/UseAuthUser';
 import {
   createMemoryHistory,
   createRouter,
   createWebHashHistory,
   createWebHistory,
+  RouteLocationNormalized,
 } from 'vue-router';
-
 import routes from './routes';
 
 /*
@@ -37,33 +35,25 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
 
-  Router.beforeEach(async (to, from, next) => {
-    const authUser = await getAuthUser();
+  Router.beforeEach(async (to: RouteLocationNormalized) => {
+    const { isLoggedIn } = useAuthUser();
 
-    console.log({ authUser });
-
-    useAuthStore().$patch({ authUser });
-
-    const requireAuth = to.meta.requireAuth;
-    if (requireAuth && !(await getAuthUser())) {
-      next('/auth/login');
-    } else if (
-      (to.path === '/auth/login' || to.path === '/auth/register') &&
-      (await getAuthUser())
+    if (
+      to.hash.includes('type=recovery') && // requisitando modificação de algo (senha)
+      to.name !== 'reset-password' // verifica se o nome da rota é diferente de reset-passord (ainda n tá na rota correta)
     ) {
-      next({ name: 'feed', replace: true });
-    } else {
-      next();
+      const accessToken = to.hash.split('&')[0]; // access token da url, coleta o primeiro parâmetro da url, que separada por & é o access token
+      const token = accessToken.replace('#access_token=', ''); // coleta o token somente
+      return { name: 'reset-password', query: { token } }; // manda para a rota de reset-password, adicionando o token na query
+    }
+
+    if (
+      !isLoggedIn() && // se não estiver logado
+      to.meta.requiresAuth && // devera ser criado em todas as rotas que deverão ser seguras (valida a securidade da rota no arquivo de rotas [routes.js])
+      !Object.keys(to.query).includes('fromEmail') // verifica se na query da rota tem incluso o 'fromEmail'
+    ) {
+      return { name: 'login' };
     }
   });
-
   return Router;
 });
-
-const getAuthUser = () => {
-  return new Promise<AuthUser | null>((resolve) => {
-    firebaseAuth.onAuthStateChanged((user) => {
-      resolve(user);
-    });
-  });
-};
